@@ -15,56 +15,173 @@ export function CommandPalette({ open, onClose, onSelect, tools, recentTools }) 
   const recentAndFiltered = recentTools.filter(({ name, keywords }) => `${name} ${keywords.join(' ')}`.toLowerCase().includes(query.toLowerCase()))
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center bg-slate-950/60 p-4 pt-20 backdrop-blur-sm" onClick={onClose} role="presentation">
-      <div className="w-full max-w-2xl rounded-3xl border border-slate-700 bg-slate-900 p-4 text-white shadow-2xl" onClick={(event) => event.stopPropagation()}>
-        <input
-          autoFocus
-          className="field border-slate-700 bg-slate-950 text-white"
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search tools…"
-          value={query}
-        />
-        <div className="mt-4 space-y-4">
+    <div
+      onClick={onClose}
+      role="presentation"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        background: 'rgba(0,0,0,0.7)',
+        padding: '5rem 1rem 1rem',
+        backdropFilter: 'blur(2px)',
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          maxWidth: '38rem',
+          background: 'var(--surface)',
+          border: '1px solid var(--line)',
+          padding: '0.75rem',
+        }}
+      >
+        {/* Search input row */}
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            borderBottom: '1px solid var(--line)',
+            paddingBottom: '0.625rem',
+            marginBottom: '0.5rem',
+          }}
+        >
+          <span aria-hidden="true" style={{ fontFamily: 'var(--font-mono)', color: 'var(--accent)', flexShrink: 0, fontSize: '0.9rem' }}>{'>'}</span>
+          <input
+            autoFocus
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search tools…"
+            style={{
+              flex: 1,
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.875rem',
+              outline: 'none',
+            }}
+            type="text"
+            value={query}
+          />
+          <button
+            aria-label="Close palette"
+            onClick={onClose}
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '0.625rem',
+              color: 'var(--dim)',
+              border: '1px solid var(--line)',
+              padding: '0.1875rem 0.5rem',
+              background: 'transparent',
+              cursor: 'pointer',
+            }}
+            type="button"
+          >
+            ESC
+          </button>
+        </div>
+
+        <div style={{ maxHeight: '26rem', overflowY: 'auto' }}>
           {!query && recentAndFiltered.length ? (
-            <section>
-              <p className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-400">Recently used</p>
-              <div className="space-y-2">
-                {recentAndFiltered.map((tool) => (
-                  <button
-                    className="flex w-full items-center justify-between rounded-2xl bg-slate-800 px-4 py-3 text-left hover:bg-slate-700"
-                    key={tool.slug}
-                    onClick={() => onSelect(tool.slug)}
-                    type="button"
-                  >
-                    <span>{tool.name}</span>
-                    <span className="text-xs text-slate-400">Open</span>
-                  </button>
-                ))}
-              </div>
-            </section>
-          ) : null}
-          <section>
-            <p className="mb-2 text-xs uppercase tracking-[0.24em] text-slate-400">All tools</p>
-            <div className="max-h-[26rem] space-y-2 overflow-y-auto pr-1">
-              {filteredTools.map((tool) => (
+            <div style={{ marginBottom: '0.25rem' }}>
+              <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5625rem', letterSpacing: '0.1em', color: 'var(--dim)', textTransform: 'uppercase', padding: '0.25rem 0.5rem 0.25rem', borderBottom: '1px solid var(--line)' }}>
+                Recently used
+              </p>
+              {recentAndFiltered.map((tool) => (
                 <button
-                  className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-left hover:bg-slate-800"
                   key={tool.slug}
                   onClick={() => onSelect(tool.slug)}
+                  style={{
+                    display: 'flex',
+                    width: '100%',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.4375rem 0.625rem',
+                    background: 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid var(--line)',
+                    borderLeft: '2px solid transparent',
+                    color: 'var(--text)',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    transition: 'border-color 100ms, background-color 100ms',
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.8125rem',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderLeftColor = 'var(--accent)'
+                    e.currentTarget.style.backgroundColor = 'rgba(95,212,160,0.06)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderLeftColor = 'transparent'
+                    e.currentTarget.style.backgroundColor = 'transparent'
+                  }}
                   type="button"
                 >
-                  <div>
-                    <p>{tool.name}</p>
-                    <p className="text-xs text-slate-400">{tool.description}</p>
-                  </div>
-                  {recentIds.has(tool.slug) ? <span className="badge bg-sky-500/20 text-sky-200">Recent</span> : null}
+                  <span>{tool.name}</span>
+                  <span style={{ fontSize: '0.625rem', color: 'var(--dim)' }}>recent</span>
                 </button>
               ))}
-              {!filteredTools.length ? <p className="px-4 py-8 text-center text-sm text-slate-400">No tools matched your search.</p> : null}
             </div>
-          </section>
+          ) : null}
+
+          <div>
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.5625rem', letterSpacing: '0.1em', color: 'var(--dim)', textTransform: 'uppercase', padding: '0.25rem 0.5rem 0.25rem', borderBottom: '1px solid var(--line)' }}>
+              All tools
+            </p>
+            {filteredTools.map((tool) => (
+              <button
+                key={tool.slug}
+                onClick={() => onSelect(tool.slug)}
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.4375rem 0.625rem',
+                  background: 'transparent',
+                  border: 'none',
+                  borderBottom: '1px solid var(--line)',
+                  borderLeft: '2px solid transparent',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'border-color 100ms, background-color 100ms',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderLeftColor = 'var(--accent)'
+                  e.currentTarget.style.backgroundColor = 'rgba(95,212,160,0.06)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderLeftColor = 'transparent'
+                  e.currentTarget.style.backgroundColor = 'transparent'
+                }}
+                type="button"
+              >
+                <div>
+                  <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: 'var(--text)' }}>{tool.name}</p>
+                  <p style={{ fontFamily: 'var(--font-sans)', fontSize: '0.75rem', color: 'var(--muted)', marginTop: '0.125rem' }}>{tool.description}</p>
+                </div>
+                {recentIds.has(tool.slug) ? (
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.625rem', color: 'var(--accent)', border: '1px solid var(--accent)', padding: '0.125rem 0.375rem', flexShrink: 0, background: 'rgba(95,212,160,0.1)' }}>
+                    recent
+                  </span>
+                ) : null}
+              </button>
+            ))}
+            {!filteredTools.length ? (
+              <p style={{ padding: '2rem 0.625rem', textAlign: 'center', fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', color: 'var(--dim)' }}>
+                No tools matched your search.
+              </p>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
   )
 }
+
