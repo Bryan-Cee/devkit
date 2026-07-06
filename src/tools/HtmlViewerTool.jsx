@@ -1,4 +1,3 @@
-import { CodeEditor, TextStats } from '../components/CodePanel'
 import { Pane, ToolLayout } from '../components/ToolLayout'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { copyText } from '../utils/devkit'
@@ -13,11 +12,11 @@ export function HtmlViewerTool() {
       onCopy={() => copyText(input)}
       title="HTML Viewer"
     >
-      <div className="panel-grid">
-        <Pane contentClassName="h-full" meta={<TextStats value={input} />} title="HTML source">
-          <CodeEditor language="html" onChange={(event) => setInput(event.target.value)} value={input} />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Pane title="HTML source">
+          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
         </Pane>
-        <Pane contentClassName="h-full" title="Live preview">
+        <Pane title="Live preview">
           <iframe className="preview-frame" sandbox="" srcDoc={input} title="HTML preview" />
         </Pane>
       </div>

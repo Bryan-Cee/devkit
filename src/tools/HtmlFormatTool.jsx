@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { CodeEditor, CodeOutput, TextStats } from '../components/CodePanel'
 import { Pane, ToolLayout } from '../components/ToolLayout'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { beautifyHtml, copyText, minifyHtml } from '../utils/devkit'
@@ -23,12 +22,12 @@ export function HtmlFormatTool() {
       onCopy={() => copyText(output)}
       title="HTML Formatter / Beautifier / Minifier"
     >
-      <div className="panel-grid">
-        <Pane contentClassName="h-full" meta={<TextStats value={input} />} title="HTML source">
-          <CodeEditor language="html" onChange={(event) => setInput(event.target.value)} value={input} />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Pane title="HTML source">
+          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
         </Pane>
-        <Pane contentClassName="h-full" meta={<TextStats value={output} />} title="Output">
-          <CodeOutput language="html" value={output} />
+        <Pane title="Output">
+          <textarea className="textarea" readOnly value={output} />
         </Pane>
       </div>
     </ToolLayout>

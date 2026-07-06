@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { CodeEditor, CodeOutput, TextStats } from '../components/CodePanel'
 import { JsonTree } from '../components/JsonTree'
 import { Pane, ToolLayout } from '../components/ToolLayout'
 import { useLocalStorage } from '../hooks/useLocalStorage'
@@ -32,19 +31,17 @@ export function JsonViewerTool() {
       onCopy={() => copyText(output)}
       title="JSON Viewer & Formatter"
     >
-      <div className="panel-grid">
-        <Pane contentClassName="h-full" meta={<TextStats value={input} />} title="Input JSON">
-          <CodeEditor language="json" onChange={(event) => setInput(event.target.value)} value={input} />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Pane title="Input JSON">
+          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
         </Pane>
-        <div className="panel-stack">
-          <Pane contentClassName="h-full" meta={<TextStats value={output} />} title="Formatted output">
-            <CodeOutput emptyLabel="Valid JSON output will appear here." language="json" value={output} />
-          </Pane>
-          <Pane contentClassName="h-full" title="Collapsible tree view">
-            {parsed ? <JsonTree value={parsed} /> : <p className="text-sm text-slate-500 dark:text-slate-400">Fix the JSON error to inspect the tree.</p>}
-          </Pane>
-        </div>
+        <Pane title="Formatted output">
+          <pre className="output-block min-h-52">{output || 'Valid JSON output will appear here.'}</pre>
+        </Pane>
       </div>
+      <Pane title="Collapsible tree view">
+        {parsed ? <JsonTree value={parsed} /> : <p className="text-sm text-slate-500 dark:text-slate-400">Fix the JSON error to inspect the tree.</p>}
+      </Pane>
     </ToolLayout>
   )
 }

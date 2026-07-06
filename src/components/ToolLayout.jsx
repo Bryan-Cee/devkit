@@ -43,17 +43,15 @@ export function ToolLayout({ title, description, onCopy, onClear, copyLabel = 'C
   )
 }
 
-export function Pane({ title, subtitle, meta, className = '', contentClassName = '', children }) {
+export function Pane({ title, subtitle, children }) {
   return (
-    <section className={`tool-card pane ${className}`.trim()}>
-      <div className="pane-header">
-        <div>
-          <h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', fontWeight: 500, color: 'var(--text)', letterSpacing: '0.03em' }}>{title}</h2>
-          {subtitle ? <p style={{ marginTop: '0.25rem', fontSize: '0.75rem', color: 'var(--muted)' }}>{subtitle}</p> : null}
-        </div>
-        {meta ? <div className="pane-meta">{meta}</div> : null}
+    <section className="tool-card" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+      <div>
+        <h2 style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8125rem', fontWeight: 500, color: 'var(--text)', letterSpacing: '0.03em' }}>{title}</h2>
+        {subtitle ? <p style={{ marginTop: '0.25rem', fontSize: '0.75rem', color: 'var(--muted)' }}>{subtitle}</p> : null}
       </div>
-      <div className={`pane-content ${contentClassName}`.trim()}>{children}</div>
+      {children}
     </section>
   )
 }
+
