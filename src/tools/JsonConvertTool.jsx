@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import YAML from 'yaml'
-import { CodeEditor, CodeOutput, TextStats } from '../components/CodePanel'
 import { Pane, ToolLayout } from '../components/ToolLayout'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { copyText, getErrorMessage, parseCsv, parseJson, toCsv } from '../utils/devkit'
@@ -35,9 +34,6 @@ export function JsonConvertTool() {
     }
   }, [input, mode])
 
-  const sourceLanguage = mode.startsWith('json') ? 'json' : 'text'
-  const outputLanguage = mode.endsWith('json') ? 'json' : 'text'
-
   return (
     <ToolLayout
       description="Convert between JSON, CSV, and YAML without leaving the browser."
@@ -55,12 +51,12 @@ export function JsonConvertTool() {
       onCopy={() => copyText(output)}
       title="JSON ↔ CSV / YAML Converter"
     >
-      <div className="panel-grid">
-        <Pane contentClassName="h-full" meta={<TextStats value={input} />} title="Source">
-          <CodeEditor language={sourceLanguage} onChange={(event) => setInput(event.target.value)} value={input} />
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Pane title="Source">
+          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
         </Pane>
-        <Pane contentClassName="h-full" meta={<TextStats value={output} />} title="Converted output">
-          <CodeOutput language={outputLanguage} value={output} />
+        <Pane title="Converted output">
+          <textarea className="textarea" readOnly value={output} />
         </Pane>
       </div>
     </ToolLayout>

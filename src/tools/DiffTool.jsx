@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { diffLines } from 'diff'
-import { CodeEditor, TextStats } from '../components/CodePanel'
 import { Pane, ToolLayout } from '../components/ToolLayout'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { copyText } from '../utils/devkit'
@@ -11,7 +10,6 @@ export function DiffTool() {
   const [mode, setMode] = useLocalStorage('devkit-diff-mode', 'inline')
 
   const changes = useMemo(() => diffLines(left, right), [left, right])
-  const diffText = useMemo(() => changes.map((part) => `${part.added ? '+' : part.removed ? '-' : ' '} ${part.value}`).join(''), [changes])
 
   return (
     <ToolLayout
@@ -26,19 +24,16 @@ export function DiffTool() {
         setLeft('')
         setRight('')
       }}
-      onCopy={() => copyText(diffText)}
+      onCopy={() => copyText(changes.map((part) => `${part.added ? '+' : part.removed ? '-' : ' '} ${part.value}`).join(''))}
       title="Diff Checker"
     >
-      <div className="panel-grid panel-grid-3">
-        <Pane contentClassName="h-full" meta={<TextStats value={left} />} title="Original text">
-          <CodeEditor onChange={(event) => setLeft(event.target.value)} value={left} />
-        </Pane>
-        <Pane contentClassName="h-full" meta={<TextStats value={right} />} title="Updated text">
-          <CodeEditor onChange={(event) => setRight(event.target.value)} value={right} />
-        </Pane>
-        <Pane contentClassName="h-full" meta={<TextStats value={diffText} />} title="Diff output">
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Pane title="Original text"><textarea className="textarea" onChange={(event) => setLeft(event.target.value)} value={left} /></Pane>
+        <Pane title="Updated text"><textarea className="textarea" onChange={(event) => setRight(event.target.value)} value={right} /></Pane>
+      </div>
+      <Pane title="Diff output">
         {mode === 'inline' ? (
-          <pre className="output-block h-full min-h-0 overflow-auto whitespace-pre">
+          <pre className="output-block min-h-64">
             {changes.map((part, index) => (
               <span
                 className={part.added ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200' : part.removed ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-200' : ''}
@@ -49,13 +44,12 @@ export function DiffTool() {
             ))}
           </pre>
         ) : (
-          <div className="grid h-full min-h-0 gap-4 lg:grid-cols-2">
-            <pre className="output-block h-full min-h-0 overflow-auto whitespace-pre">{left}</pre>
-            <pre className="output-block h-full min-h-0 overflow-auto whitespace-pre">{right}</pre>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <pre className="output-block min-h-64">{left}</pre>
+            <pre className="output-block min-h-64">{right}</pre>
           </div>
         )}
-        </Pane>
-      </div>
+      </Pane>
     </ToolLayout>
   )
 }
