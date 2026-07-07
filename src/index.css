@@ -3,55 +3,56 @@
 
 /* ─── Design tokens ──────────────────────────────────────────────────────────── */
 :root {
-  /* Dark theme — Catppuccin Mocha (https://github.com/catppuccin/catppuccin) */
-  --bg: #1e1e2e;            /* Base */
-  --surface: #181825;       /* Mantle */
-  --surface-hover: #313244; /* Surface0 */
-  --line: #313244;          /* Surface0 */
-  --text: #cdd6f4;          /* Text */
-  --muted: #a6adc8;         /* Subtext0 */
-  --dim: #6c7086;           /* Overlay0 */
-  --accent: #94e2d5;        /* Teal */
-  --accent-rgb: 148, 226, 213;
+  /* Dark theme — GitHub Dark terminal color scheme (https://github.com/primer/primitives) */
+  --bg: #0d1117;            /* canvas.default */
+  --surface: #010409;       /* canvas.inset */
+  --surface-hover: #21262d; /* neutral.muted */
+  --line: #30363d;          /* border.default */
+  --text: #e6edf3;          /* fg.default */
+  --muted: #8b949e;         /* fg.muted */
+  --dim: #6e7681;           /* fg.subtle */
+  --accent: #3fb950;        /* ANSI green */
+  --accent-rgb: 63, 185, 80;
   --accent-dim: rgba(var(--accent-rgb), 0.22);
   /* Syntax tokens — shared by every panel that renders formatted code */
-  --key: #89b4fa;           /* Blue */
-  --string: #a6e3a1;        /* Green */
-  --number: #fab387;        /* Peach */
-  --bool: #cba6f7;          /* Mauve */
+  --key: #58a6ff;           /* ANSI blue */
+  --string: #7ee787;        /* ANSI bright green */
+  --number: #ffa657;        /* ANSI orange */
+  --bool: #bc8cff;          /* ANSI magenta */
   /* Diff tokens (diff output only) */
-  --add: #a6e3a1;           /* Green */
-  --rem: #f38ba8;           /* Red */
-  --rem-rgb: 243, 139, 168;
-  --add-bg: rgba(166, 227, 161, 0.14);
+  --add: #3fb950;           /* ANSI green */
+  --rem: #ff7b72;           /* ANSI red */
+  --rem-rgb: 255, 123, 114;
+  --add-bg: rgba(63, 185, 80, 0.14);
   --rem-bg: rgba(var(--rem-rgb), 0.14);
-  --mark-rgb: 249, 226, 175; /* Yellow */
+  --mark-rgb: 210, 153, 34; /* ANSI yellow */
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Fira Mono', monospace;
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   color-scheme: dark;
 }
 
 :root.light {
-  --bg: #F2F0E9;
-  --surface: #FFFFFF;
-  --surface-hover: #F5F3EC;
-  --line: #D4D0C8;
-  --text: #1B1F23;
-  --muted: #5A6472;
-  --dim: #8B95A1;
-  --accent: #5FD4A0;
-  --accent-rgb: 95, 212, 160;
+  /* Light theme — GitHub Light color scheme */
+  --bg: #f6f8fa;
+  --surface: #ffffff;
+  --surface-hover: #eaeef2;
+  --line: #d0d7de;
+  --text: #1f2328;
+  --muted: #656d76;
+  --dim: #6e7781;
+  --accent: #1a7f37;
+  --accent-rgb: 26, 127, 55;
   --accent-dim: rgba(var(--accent-rgb), 0.28);
-  --key: #1F6FEB;
-  --string: #B7791F;
-  --number: #C05621;
-  --bool: #8250DF;
-  --add: #1A7F5A;
-  --rem: #C23A3A;
-  --rem-rgb: 224, 82, 82;
-  --add-bg: rgba(95, 212, 160, 0.18);
-  --rem-bg: rgba(224, 82, 82, 0.16);
-  --mark-rgb: 245, 158, 11;
+  --key: #0969da;
+  --string: #116329;
+  --number: #953800;
+  --bool: #8250df;
+  --add: #1a7f37;
+  --rem: #cf222e;
+  --rem-rgb: 207, 34, 46;
+  --add-bg: rgba(26, 127, 55, 0.12);
+  --rem-bg: rgba(207, 34, 46, 0.12);
+  --mark-rgb: 154, 103, 0;
   color-scheme: light;
 }
 
