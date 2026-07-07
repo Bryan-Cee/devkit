@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { copyText, formatInTimeZone, getTimeZones } from '../utils/devkit'
 
@@ -25,39 +25,53 @@ export function TimestampTool() {
     }
   }, [dateText, epoch, timeZone])
 
+  const combined = `${output.epochToHuman}\n\n${output.humanToEpoch}`
+
   return (
-    <ToolLayout
-      description="Convert Unix timestamps and human-readable dates with a timezone picker."
-      extraActions={
-        <select className="select" onChange={(event) => setTimeZone(event.target.value)} value={timeZone}>
-          {TIME_ZONES.map((zone) => (
-            <option key={zone} value={zone}>
-              {zone}
-            </option>
-          ))}
-        </select>
-      }
-      onClear={() => {
-        setEpoch('')
-        setDateText('')
-      }}
-      onCopy={() => copyText(`${output.epochToHuman}\n\n${output.humanToEpoch}`)}
+    <ToolShell
       title="Timestamp Converter"
+      description="Convert Unix timestamps and human-readable dates with a timezone picker."
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => copyText(combined)} type="button">Copy output</button>
+          <button className="btn btn-danger" onClick={() => { setEpoch(''); setDateText('') }} type="button">Clear</button>
+        </>
+      }
+      controls={
+        <>
+          <label className="chip-group">
+            <span className="chip-group__label">Unix epoch</span>
+            <input aria-label="Unix epoch" className="field field-mono" onChange={(event) => setEpoch(event.target.value)} style={{ width: '11rem' }} value={epoch} />
+          </label>
+          <label className="chip-group">
+            <span className="chip-group__label">Date/time</span>
+            <input aria-label="Human-readable date" className="field field-mono" onChange={(event) => setDateText(event.target.value)} style={{ width: '13rem' }} type="datetime-local" value={dateText} />
+          </label>
+          <label className="chip-group">
+            <span className="chip-group__label">Zone</span>
+            <select className="select" onChange={(event) => setTimeZone(event.target.value)} style={{ width: 'auto' }} value={timeZone}>
+              {TIME_ZONES.map((zone) => (
+                <option key={zone} value={zone}>{zone}</option>
+              ))}
+            </select>
+          </label>
+        </>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Inputs">
-          <label className="text-sm font-medium">Unix epoch</label>
-          <input className="field mt-2" onChange={(event) => setEpoch(event.target.value)} value={epoch} />
-          <label className="mt-4 block text-sm font-medium">Human-readable date</label>
-          <input className="field mt-2" onChange={(event) => setDateText(event.target.value)} type="datetime-local" value={dateText} />
-        </Pane>
-        <Pane title="Conversions">
-          <div className="space-y-3">
-            <div className="output-block">Epoch → Human\n{output.epochToHuman}</div>
-            <div className="output-block">Human → Epoch\n{output.humanToEpoch}</div>
+      <div className="workspace workspace--E">
+        <Panel title="Conversions" onCopy={() => copyText(combined)}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <div>
+              <div className="chip-group__label" style={{ marginBottom: '0.25rem' }}>Epoch → Human</div>
+              <pre className="panel-output">{output.epochToHuman}</pre>
+            </div>
+            <div>
+              <div className="chip-group__label" style={{ marginBottom: '0.25rem' }}>Human → Epoch</div>
+              <pre className="panel-output">{output.humanToEpoch}</pre>
+            </div>
           </div>
-        </Pane>
+        </Panel>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }

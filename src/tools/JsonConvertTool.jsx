@@ -1,8 +1,10 @@
 import { useMemo } from 'react'
 import YAML from 'yaml'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { JsonTree } from '../components/JsonTree'
+import { ToolShell, Panel, CodeInput, CodeBlock } from '../components/Shell'
+import { highlightJson } from '../components/highlight'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { copyText, getErrorMessage, parseCsv, parseJson, toCsv } from '../utils/devkit'
+import { byteCount, copyText, getErrorMessage, lineCount, parseCsv, parseJson, toCsv } from '../utils/devkit'
 
 const MODES = [
   { value: 'json-csv', label: 'JSON → CSV' },
@@ -10,6 +12,22 @@ const MODES = [
   { value: 'json-yaml', label: 'JSON → YAML' },
   { value: 'yaml-json', label: 'YAML → JSON' },
 ]
+
+const JSON_OUTPUT = new Set(['csv-json', 'yaml-json'])
+
+function parseSource(mode, input) {
+  switch (mode) {
+    case 'json-csv':
+    case 'json-yaml':
+      return parseJson(input)
+    case 'csv-json':
+      return parseCsv(input)
+    case 'yaml-json':
+      return YAML.parse(input)
+    default:
+      return null
+  }
+}
 
 export function JsonConvertTool() {
   const [mode, setMode] = useLocalStorage('devkit-json-convert-mode', 'json-csv')
@@ -34,31 +52,49 @@ export function JsonConvertTool() {
     }
   }, [input, mode])
 
+  const tree = useMemo(() => {
+    try {
+      const value = parseSource(mode, input)
+      return value && typeof value === 'object' ? value : null
+    } catch {
+      return null
+    }
+  }, [input, mode])
+
   return (
-    <ToolLayout
+    <ToolShell
+      title="JSON ↔ CSV / YAML Converter"
       description="Convert between JSON, CSV, and YAML without leaving the browser."
       error={error}
-      extraActions={
-        <select className="select" onChange={(event) => setMode(event.target.value)} value={mode}>
-          {MODES.map((item) => (
-            <option key={item.value} value={item.value}>
-              {item.label}
-            </option>
-          ))}
-        </select>
+      actions={
+        <>
+          <select className="select" onChange={(event) => setMode(event.target.value)} value={mode}>
+            {MODES.map((item) => (
+              <option key={item.value} value={item.value}>{item.label}</option>
+            ))}
+          </select>
+          <button className="btn btn-secondary" onClick={() => copyText(output)} type="button">Copy output</button>
+          <button className="btn btn-danger" onClick={() => setInput('')} type="button">Clear</button>
+        </>
       }
-      onClear={() => setInput('')}
-      onCopy={() => copyText(output)}
-      title="JSON ↔ CSV / YAML Converter"
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Source">
-          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
-        </Pane>
-        <Pane title="Converted output">
-          <textarea className="textarea" readOnly value={output} />
-        </Pane>
+      <div className="workspace workspace--A">
+        <Panel title="Source" flush meta={`${lineCount(input)} ln · ${byteCount(input)} B`}>
+          <CodeInput ariaLabel="Source" onChange={setInput} value={input} />
+        </Panel>
+        <Panel
+          title="Converted output"
+          flush
+          validity={error ? 'error' : output ? 'valid' : undefined}
+          meta={`${lineCount(output)} ln · ${byteCount(output)} B`}
+          onCopy={() => copyText(output)}
+        >
+          <CodeBlock highlight={JSON_OUTPUT.has(mode) ? highlightJson : undefined} text={output} />
+        </Panel>
+        <Panel title="Tree" meta={tree ? `${Array.isArray(tree) ? tree.length : Object.keys(tree).length} items` : ''}>
+          {tree ? <JsonTree value={tree} /> : <p className="panel-placeholder">Provide nestable data to inspect the tree.</p>}
+        </Panel>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }

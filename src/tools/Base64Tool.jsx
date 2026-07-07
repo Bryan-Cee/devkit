@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel, CodeInput, CodeBlock } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { base64Decode, base64Encode, copyText, getErrorMessage } from '../utils/devkit'
+import { base64Decode, base64Encode, byteCount, copyText, getErrorMessage, lineCount } from '../utils/devkit'
 
 export function Base64Tool() {
   const [input, setInput] = useLocalStorage('devkit-base64-input', 'Hello DevKit')
@@ -30,33 +30,38 @@ export function Base64Tool() {
     setFileResult(text)
   }
 
+  const result = fileResult || output
+
   return (
-    <ToolLayout
+    <ToolShell
+      title="Base64 Encode/Decode"
       description="Encode or decode base64 text, plus inspect the base64 output of a file or image."
       error={error}
-      extraActions={
-        <select className="select" onChange={(event) => setMode(event.target.value)} value={mode}>
-          <option value="encode">Encode text</option>
-          <option value="decode">Decode text</option>
-        </select>
+      actions={
+        <>
+          <select className="select" onChange={(event) => setMode(event.target.value)} value={mode}>
+            <option value="encode">Encode text</option>
+            <option value="decode">Decode text</option>
+          </select>
+          <button className="btn btn-secondary" onClick={() => copyText(result)} type="button">Copy output</button>
+          <button className="btn btn-danger" onClick={() => { setInput(''); setFileResult('') }} type="button">Clear</button>
+        </>
       }
-      onClear={() => {
-        setInput('')
-        setFileResult('')
-      }}
-      onCopy={() => copyText(fileResult || output)}
-      title="Base64 Encode/Decode"
+      controls={
+        <label className="chip-group">
+          <span className="chip-group__label">File / image → base64</span>
+          <input aria-label="File to base64" className="field-mono" onChange={onFile} type="file" />
+        </label>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Text input">
-          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
-          <label className="mt-4 block text-sm font-medium">File / image to base64</label>
-          <input className="mt-2 block w-full text-sm" onChange={onFile} type="file" />
-        </Pane>
-        <Pane title="Output">
-          <textarea className="textarea" readOnly value={fileResult || output} />
-        </Pane>
+      <div className="workspace workspace--cols-2">
+        <Panel title="Text input" flush meta={`${lineCount(input)} ln · ${byteCount(input)} B`}>
+          <CodeInput ariaLabel="Text input" onChange={setInput} value={input} />
+        </Panel>
+        <Panel title="Output" flush validity={error ? 'error' : result ? 'valid' : undefined} meta={`${byteCount(result)} B`} onCopy={() => copyText(result)}>
+          <CodeBlock text={result} />
+        </Panel>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }

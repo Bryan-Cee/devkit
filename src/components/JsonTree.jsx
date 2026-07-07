@@ -1,5 +1,13 @@
 import { useState } from 'react'
 
+function classForValue(value) {
+  if (typeof value === 'string') return 'tok-string'
+  if (typeof value === 'number') return 'tok-number'
+  if (typeof value === 'boolean') return 'tok-bool'
+  if (value === null) return 'tok-null'
+  return ''
+}
+
 function labelFor(value) {
   if (Array.isArray(value)) return `Array(${value.length})`
   if (value && typeof value === 'object') return 'Object'
@@ -12,9 +20,9 @@ function TreeNode({ label, value, depth = 0 }) {
 
   if (!isBranch) {
     return (
-      <div className="font-mono text-sm">
-        <span className="text-slate-500 dark:text-slate-400">{label}: </span>
-        <span>{labelFor(value)}</span>
+      <div style={{ fontFamily: 'var(--font-mono)' }}>
+        <span className="tree-leaf-key">{label}: </span>
+        <span className={classForValue(value)}>{labelFor(value)}</span>
       </div>
     )
   }
@@ -22,12 +30,12 @@ function TreeNode({ label, value, depth = 0 }) {
   const entries = Array.isArray(value) ? value.map((item, index) => [index, item]) : Object.entries(value)
 
   return (
-    <div className="space-y-2">
-      <button className="font-mono text-left text-sm text-sky-600 dark:text-sky-300" onClick={() => setOpen((current) => !current)} type="button">
+    <div>
+      <button className="tree-toggle" onClick={() => setOpen((current) => !current)} type="button">
         {open ? '▾' : '▸'} {label}: {labelFor(value)}
       </button>
       {open ? (
-        <div className="space-y-2 border-l border-slate-200 pl-4 dark:border-slate-700">
+        <div className="tree-children">
           {entries.map(([childLabel, childValue]) => (
             <TreeNode depth={depth + 1} key={childLabel} label={String(childLabel)} value={childValue} />
           ))}
@@ -38,5 +46,9 @@ function TreeNode({ label, value, depth = 0 }) {
 }
 
 export function JsonTree({ value }) {
-  return <TreeNode label="root" value={value} />
+  return (
+    <div className="tree-panel">
+      <TreeNode label="root" value={value} />
+    </div>
+  )
 }

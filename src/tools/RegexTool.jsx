@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel, CodeInput } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { copyText, getErrorMessage } from '../utils/devkit'
+import { byteCount, copyText, getErrorMessage, lineCount } from '../utils/devkit'
 
 export function RegexTool() {
   const [pattern, setPattern] = useLocalStorage('devkit-regex-pattern', '(Dev)(Kit)')
@@ -32,43 +32,49 @@ export function RegexTool() {
   }, [flags, input, pattern])
 
   return (
-    <ToolLayout
+    <ToolShell
+      title="RegExp Tester"
       description="Test a regular expression live with match highlighting and capture groups."
       error={error}
-      onClear={() => {
-        setPattern('')
-        setFlags('')
-        setInput('')
-      }}
-      onCopy={() => copyText(JSON.stringify(matches.map((match) => ({ match: match[0], groups: [...match].slice(1) })), null, 2))}
-      title="RegExp Tester"
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => copyText(JSON.stringify(matches.map((match) => ({ match: match[0], groups: [...match].slice(1) })), null, 2))} type="button">Copy matches</button>
+          <button className="btn btn-danger" onClick={() => { setPattern(''); setFlags(''); setInput('') }} type="button">Clear</button>
+        </>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Inputs">
-          <label className="text-sm font-medium">Pattern</label>
-          <input className="field mt-2" onChange={(event) => setPattern(event.target.value)} value={pattern} />
-          <label className="mt-4 block text-sm font-medium">Flags</label>
-          <input className="field mt-2" onChange={(event) => setFlags(event.target.value)} value={flags} />
-          <label className="mt-4 block text-sm font-medium">Test text</label>
-          <textarea className="textarea mt-2" onChange={(event) => setInput(event.target.value)} value={input} />
-        </Pane>
-        <Pane title="Matches">
-          <div className="output-block min-h-52">
-            {segments.map((segment) => (
-              <span className={segment.match ? 'mark-highlight' : ''} key={segment.key}>
-                {segment.text}
-              </span>
-            ))}
+      <div className="workspace workspace--G">
+        <Panel title="Pattern" flush validity={error ? 'error' : pattern ? 'valid' : undefined} meta={`${matches.length} matches`}>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <span style={{ padding: '0 0.5rem', color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>/</span>
+            <input aria-label="Pattern" className="pattern-input" onChange={(event) => setPattern(event.target.value)} placeholder="pattern" value={pattern} />
+            <span style={{ padding: '0 0.25rem', color: 'var(--muted)', fontFamily: 'var(--font-mono)' }}>/</span>
+            <input aria-label="Flags" className="pattern-input" onChange={(event) => setFlags(event.target.value)} placeholder="flags" style={{ width: '5rem', flex: 'none' }} value={flags} />
           </div>
-          <div className="mt-4 space-y-2">
-            {matches.map((match, index) => (
-              <div className="output-block" key={`${match[0]}-${index}`}>
-                Match {index + 1}: {match[0]}\nGroups: {JSON.stringify([...match].slice(1))}
+        </Panel>
+        <div className="regex-body">
+          <Panel title="Test string" flush meta={`${lineCount(input)} ln · ${byteCount(input)} B`}>
+            <CodeInput ariaLabel="Test string" onChange={setInput} value={input} />
+          </Panel>
+          <Panel title="Matches" meta={`${matches.length} matches`}>
+            <pre className="panel-output">
+              {segments.map((segment) => (
+                <span className={segment.match ? 'regex-mark' : ''} key={segment.key}>{segment.text}</span>
+              ))}
+            </pre>
+            {matches.length ? (
+              <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {matches.map((match, index) => (
+                  <div className="kv-row" key={`${match[0]}-${index}`}>
+                    <span className="kv-label">match {index + 1}</span>
+                    <span className="kv-value">{match[0]} · groups: {JSON.stringify([...match].slice(1))}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </Pane>
+            ) : null}
+          </Panel>
+        </div>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }
