@@ -6,6 +6,8 @@
 
 **Fast. Private. 100% client-side.** No sign-ups, no servers, no data ever leaving your machine.
 
+**🔗 [Live demo →](https://devkit-box.vercel.app/)**
+
 [![Built with Vite](https://img.shields.io/badge/Built%20with-Vite-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
