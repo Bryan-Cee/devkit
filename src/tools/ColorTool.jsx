@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { copyText, hexToRgb, normalizeHex, paletteFromHex, rgbToHsl } from '../utils/devkit'
 
@@ -10,32 +10,48 @@ export function ColorTool() {
   const hsl = useMemo(() => rgbToHsl(rgb), [rgb])
   const palette = useMemo(() => paletteFromHex(hex), [hex])
 
+  const summary = `HEX: ${hex}\nRGB: ${rgb.r}, ${rgb.g}, ${rgb.b}\nHSL: ${hsl.h}, ${hsl.s}%, ${hsl.l}%`
+
   return (
-    <ToolLayout
-      description="Convert HEX, RGB, and HSL values while generating a quick palette."
-      onClear={() => setInput('#0EA5E9')}
-      onCopy={() => copyText(JSON.stringify({ hex, rgb, hsl, palette }, null, 2))}
+    <ToolShell
       title="Color Picker/Converter"
+      description="Convert HEX, RGB, and HSL values while generating a quick palette."
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => copyText(JSON.stringify({ hex, rgb, hsl, palette }, null, 2))} type="button">Copy all</button>
+          <button className="btn btn-danger" onClick={() => setInput('#0EA5E9')} type="button">Reset</button>
+        </>
+      }
+      controls={
+        <>
+          <label className="chip-group">
+            <span className="chip-group__label">Hex</span>
+            <input aria-label="Color value" className="field field-mono" onChange={(event) => setInput(event.target.value)} style={{ width: '9rem' }} value={input} />
+          </label>
+          <label className="chip-group">
+            <span className="chip-group__label">Pick</span>
+            <input aria-label="Color picker" onChange={(event) => setInput(event.target.value)} style={{ width: '3rem', height: '2rem', border: '1px solid var(--line)', background: 'transparent' }} type="color" value={hex} />
+          </label>
+        </>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Input color">
-          <input className="field" onChange={(event) => setInput(event.target.value)} value={input} />
-          <input className="mt-4 h-16 w-full rounded-xl border border-slate-300 bg-transparent dark:border-slate-700" onChange={(event) => setInput(event.target.value)} type="color" value={hex} />
-        </Pane>
-        <Pane title="Conversions & palette">
-          <div className="space-y-3">
-            <div className="output-block">HEX: {hex}\nRGB: {rgb.r}, {rgb.g}, {rgb.b}\nHSL: {hsl.h}, {hsl.s}%, {hsl.l}%</div>
-            <div className="grid gap-3 sm:grid-cols-5">
-              {palette.map((swatch) => (
-                <div className="space-y-2 text-center" key={swatch.hex}>
-                  <div className="h-16 rounded-xl border border-slate-200 dark:border-slate-700" style={{ backgroundColor: swatch.hex }} />
-                  <div className="text-xs font-mono">{swatch.hex}</div>
-                </div>
-              ))}
-            </div>
+      <div className="workspace workspace--cols-2">
+        <Panel title="Conversions" onCopy={() => copyText(summary)}>
+          <div className="kv-row"><span className="kv-label">hex</span><span className="kv-value">{hex}</span></div>
+          <div className="kv-row"><span className="kv-label">rgb</span><span className="kv-value">{rgb.r}, {rgb.g}, {rgb.b}</span></div>
+          <div className="kv-row"><span className="kv-label">hsl</span><span className="kv-value">{hsl.h}, {hsl.s}%, {hsl.l}%</span></div>
+        </Panel>
+        <Panel title="Palette">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(4rem, 1fr))', gap: '0.75rem' }}>
+            {palette.map((swatch) => (
+              <div key={swatch.hex} style={{ textAlign: 'center' }}>
+                <div style={{ height: '3.5rem', border: '1px solid var(--line)', backgroundColor: swatch.hex }} />
+                <div style={{ marginTop: '0.375rem', fontFamily: 'var(--font-mono)', fontSize: '0.6875rem', color: 'var(--muted)' }}>{swatch.hex}</div>
+              </div>
+            ))}
           </div>
-        </Pane>
+        </Panel>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }

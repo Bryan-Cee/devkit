@@ -3,6 +3,18 @@ export async function copyText(value) {
   await navigator.clipboard.writeText(String(value ?? ''))
 }
 
+// Presentation helpers for panel meta lines.
+export function lineCount(text) {
+  if (!text) return 0
+  return String(text).split('\n').length
+}
+
+export function byteCount(text) {
+  if (!text) return 0
+  if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(String(text)).length
+  return String(text).length
+}
+
 export function getErrorMessage(error) {
   return error instanceof Error ? error.message : String(error)
 }

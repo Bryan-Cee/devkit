@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel, CodeInput, CodeBlock } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { copyText, getErrorMessage } from '../utils/devkit'
+import { byteCount, copyText, getErrorMessage, lineCount } from '../utils/devkit'
 
 export function UrlCodecTool() {
   const [input, setInput] = useLocalStorage('devkit-url-codec-input', 'name=Dev Kit & theme=light')
@@ -16,23 +16,29 @@ export function UrlCodecTool() {
   }, [input, mode])
 
   return (
-    <ToolLayout
+    <ToolShell
+      title="URL Encoder/Decoder"
       description="Encode or decode URL-safe text fragments."
       error={error}
-      extraActions={
-        <select className="select" onChange={(event) => setMode(event.target.value)} value={mode}>
-          <option value="encode">Encode</option>
-          <option value="decode">Decode</option>
-        </select>
+      actions={
+        <>
+          <select className="select" onChange={(event) => setMode(event.target.value)} value={mode}>
+            <option value="encode">Encode</option>
+            <option value="decode">Decode</option>
+          </select>
+          <button className="btn btn-secondary" onClick={() => copyText(output)} type="button">Copy output</button>
+          <button className="btn btn-danger" onClick={() => setInput('')} type="button">Clear</button>
+        </>
       }
-      onClear={() => setInput('')}
-      onCopy={() => copyText(output)}
-      title="URL Encoder/Decoder"
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Input"><textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} /></Pane>
-        <Pane title="Output"><textarea className="textarea" readOnly value={output} /></Pane>
+      <div className="workspace workspace--cols-2">
+        <Panel title="Input" flush meta={`${lineCount(input)} ln · ${byteCount(input)} B`}>
+          <CodeInput ariaLabel="Input" onChange={setInput} value={input} />
+        </Panel>
+        <Panel title="Output" flush validity={error ? 'error' : output ? 'valid' : undefined} meta={`${byteCount(output)} B`} onCopy={() => copyText(output)}>
+          <CodeBlock text={output} />
+        </Panel>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }

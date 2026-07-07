@@ -1,12 +1,19 @@
 import { useMemo, useState } from 'react'
 import { JsonTree } from '../components/JsonTree'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel, CodeInput, CodeBlock, ViewToggle } from '../components/Shell'
+import { highlightJson } from '../components/highlight'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { collectJsonError, copyText, formatJson, getErrorMessage, parseJson } from '../utils/devkit'
+import { byteCount, collectJsonError, copyText, formatJson, getErrorMessage, lineCount, parseJson } from '../utils/devkit'
+
+const VIEWS = [
+  { value: 'split', label: 'Split' },
+  { value: 'tree', label: 'Tree only' },
+]
 
 export function JsonViewerTool() {
   const [input, setInput] = useLocalStorage('devkit-json-viewer-input', '{"hello":"world"}')
   const [minified, setMinified] = useState(false)
+  const [view, setView] = useState('split')
 
   const { parsed, output, error } = useMemo(() => {
     try {
@@ -17,31 +24,47 @@ export function JsonViewerTool() {
     }
   }, [input, minified])
 
+  const treePanel = (
+    <Panel title="Tree" meta={parsed && typeof parsed === 'object' ? `${Array.isArray(parsed) ? parsed.length : Object.keys(parsed).length} items` : ''}>
+      {parsed ? <JsonTree value={parsed} /> : <p className="panel-placeholder">Fix the JSON error to inspect the tree.</p>}
+    </Panel>
+  )
+
   return (
-    <ToolLayout
-      copyLabel="Copy JSON"
+    <ToolShell
+      title="JSON Viewer & Formatter"
       description="Paste JSON to validate, pretty-print or minify it, and inspect the structure in a collapsible tree."
       error={error}
-      extraActions={
-        <button className="btn btn-secondary" onClick={() => setMinified((current) => !current)} type="button">
-          {minified ? 'Beautify' : 'Minify'}
-        </button>
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => setMinified((current) => !current)} type="button">
+            {minified ? 'Beautify' : 'Minify'}
+          </button>
+          <button className="btn btn-secondary" onClick={() => copyText(output)} type="button">Copy JSON</button>
+          <button className="btn btn-danger" onClick={() => setInput('')} type="button">Clear</button>
+        </>
       }
-      onClear={() => setInput('')}
-      onCopy={() => copyText(output)}
-      title="JSON Viewer & Formatter"
+      view={<ViewToggle options={VIEWS} value={view} onChange={setView} />}
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Input JSON">
-          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
-        </Pane>
-        <Pane title="Formatted output">
-          <pre className="output-block min-h-52">{output || 'Valid JSON output will appear here.'}</pre>
-        </Pane>
-      </div>
-      <Pane title="Collapsible tree view">
-        {parsed ? <JsonTree value={parsed} /> : <p className="text-sm text-slate-500 dark:text-slate-400">Fix the JSON error to inspect the tree.</p>}
-      </Pane>
-    </ToolLayout>
+      {view === 'tree' ? (
+        <div className="workspace workspace--E">{treePanel}</div>
+      ) : (
+        <div className="workspace workspace--A">
+          <Panel title="Input JSON" flush meta={`${lineCount(input)} ln · ${byteCount(input)} B`}>
+            <CodeInput ariaLabel="Input JSON" onChange={setInput} value={input} />
+          </Panel>
+          <Panel
+            title="Formatted output"
+            flush
+            validity={error ? 'error' : output ? 'valid' : undefined}
+            meta={`${lineCount(output)} ln · ${byteCount(output)} B`}
+            onCopy={() => copyText(output)}
+          >
+            <CodeBlock highlight={highlightJson} placeholder="Valid JSON output will appear here." text={output} />
+          </Panel>
+          {treePanel}
+        </div>
+      )}
+    </ToolShell>
   )
 }

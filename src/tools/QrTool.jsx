@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import QRCode from 'qrcode'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
 import { copyText } from '../utils/devkit'
 
@@ -19,18 +19,33 @@ export function QrTool() {
   }, [input])
 
   return (
-    <ToolLayout
-      description="Generate a QR code locally from text or a URL."
-      onClear={() => setInput('')}
-      onCopy={() => copyText(output)}
+    <ToolShell
       title="QR Code Generator"
+      description="Generate a QR code locally from text or a URL."
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => copyText(output)} type="button">Copy data URL</button>
+          <button className="btn btn-danger" onClick={() => setInput('')} type="button">Clear</button>
+        </>
+      }
+      controls={
+        <label className="chip-group" style={{ flex: 1, minWidth: '16rem' }}>
+          <span className="chip-group__label">Content</span>
+          <input
+            aria-label="Text or URL"
+            className="field field-mono"
+            onChange={(event) => setInput(event.target.value)}
+            placeholder="Text or URL"
+            value={input}
+          />
+        </label>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Text or URL"><textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} /></Pane>
-        <Pane title="QR output">
-          {output ? <img alt="Generated QR code" className="mx-auto rounded-2xl bg-white p-4" src={output} /> : <p className="text-sm text-slate-500 dark:text-slate-400">Enter text to generate a QR code.</p>}
-        </Pane>
+      <div className="workspace workspace--E">
+        <Panel title="QR output" bodyClassName="panel-center">
+          {output ? <img alt="Generated QR code" src={output} style={{ background: '#fff', padding: '1rem' }} /> : <p className="panel-placeholder">Enter text to generate a QR code.</p>}
+        </Panel>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }

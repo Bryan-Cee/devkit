@@ -1,28 +1,47 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { marked } from 'marked'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel, CodeInput, ViewToggle } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { copyText, previewDocument } from '../utils/devkit'
+import { byteCount, copyText, lineCount, previewDocument } from '../utils/devkit'
+
+const VIEWS = [
+  { value: 'split', label: 'Split' },
+  { value: 'preview', label: 'Preview only' },
+]
 
 export function MarkdownTool() {
   const [input, setInput] = useLocalStorage('devkit-markdown-input', '# DevKit\n\n- Client-side only\n- Fast static tools\n- GitHub Pages ready')
+  const [view, setView] = useState('split')
   const html = useMemo(() => marked.parse(input), [input])
 
+  const preview = (
+    <Panel title="Preview" flush>
+      <iframe className="panel-iframe" sandbox="" srcDoc={previewDocument(html)} title="Markdown preview" />
+    </Panel>
+  )
+
   return (
-    <ToolLayout
-      description="Write markdown and preview the rendered result live."
-      onClear={() => setInput('')}
-      onCopy={() => copyText(input)}
+    <ToolShell
       title="Markdown Previewer"
+      description="Write markdown and preview the rendered result live."
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => copyText(input)} type="button">Copy markdown</button>
+          <button className="btn btn-danger" onClick={() => setInput('')} type="button">Clear</button>
+        </>
+      }
+      view={<ViewToggle options={VIEWS} value={view} onChange={setView} />}
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Markdown source">
-          <textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} />
-        </Pane>
-        <Pane title="Preview">
-          <iframe className="preview-frame" sandbox="" srcDoc={previewDocument(html)} title="Markdown preview" />
-        </Pane>
-      </div>
-    </ToolLayout>
+      {view === 'preview' ? (
+        <div className="workspace workspace--E">{preview}</div>
+      ) : (
+        <div className="workspace workspace--cols-2">
+          <Panel title="Markdown source" flush meta={`${lineCount(input)} ln · ${byteCount(input)} B`}>
+            <CodeInput ariaLabel="Markdown source" onChange={setInput} value={input} />
+          </Panel>
+          {preview}
+        </div>
+      )}
+    </ToolShell>
   )
 }

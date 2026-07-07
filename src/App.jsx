@@ -136,10 +136,12 @@ function ToolRoute() {
 
   if (!tool) {
     return (
-      <section className="tool-card">
-        <h1 style={{ fontFamily: 'var(--font-mono)', fontSize: '1.25rem', fontWeight: 500 }}>Tool not found</h1>
-        <p style={{ marginTop: '0.5rem', fontSize: '0.8125rem', color: 'var(--muted)' }}>Pick a tool from the sidebar or return home.</p>
-      </section>
+      <div className="page-scroll">
+        <section className="tool-card">
+          <h1 style={{ fontFamily: 'var(--font-mono)', fontSize: '1.25rem', fontWeight: 500 }}>Tool not found</h1>
+          <p style={{ marginTop: '0.5rem', fontSize: '0.8125rem', color: 'var(--muted)' }}>Pick a tool from the sidebar or return home.</p>
+        </section>
+      </div>
     )
   }
 
@@ -147,9 +149,11 @@ function ToolRoute() {
   return (
     <Suspense
       fallback={
-        <section className="tool-card">
-          <p style={{ fontSize: '0.8125rem', color: 'var(--muted)' }}>Loading tool…</p>
-        </section>
+        <div className="page-scroll">
+          <section className="tool-card">
+            <p style={{ fontSize: '0.8125rem', color: 'var(--muted)' }}>Loading tool…</p>
+          </section>
+        </div>
       }
     >
       <Component />
@@ -208,7 +212,7 @@ export default function App() {
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
+    <div className="app-shell" style={{ background: 'var(--bg)', display: 'flex', flexDirection: 'column' }}>
       <CommandPalette onClose={() => setPaletteOpen(false)} onSelect={selectTool} open={paletteOpen} recentTools={recentTools} tools={tools} />
 
       {/* Mobile top bar */}
@@ -232,7 +236,7 @@ export default function App() {
         </button>
       </div>
 
-      <div style={{ display: 'flex', flex: 1 }}>
+      <div className="app-body" style={{ display: 'flex', flex: 1 }}>
         {/* Sidebar overlay (mobile) */}
         <div
           className={`sidebar-overlay${navOpen ? ' sidebar-overlay--open' : ''}`}
@@ -284,9 +288,9 @@ export default function App() {
         </aside>
 
         {/* Main content */}
-        <main style={{ flex: 1, padding: '1.5rem', maxWidth: '56rem', minWidth: 0 }}>
+        <main className="main-area">
           <Routes>
-            <Route element={<Home recentTools={recentTools} />} path="/" />
+            <Route element={<div className="page-scroll"><Home recentTools={recentTools} /></div>} path="/" />
             <Route element={<ToolRoute />} path="/tool/:slug" />
           </Routes>
         </main>

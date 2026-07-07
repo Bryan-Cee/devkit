@@ -1,32 +1,35 @@
 import { useMemo } from 'react'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel, CodeInput } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { copyText, toCases } from '../utils/devkit'
+import { byteCount, copyText, toCases } from '../utils/devkit'
 
 export function CaseTool() {
   const [input, setInput] = useLocalStorage('devkit-case-input', 'dev kit utility')
   const output = useMemo(() => toCases(input), [input])
 
   return (
-    <ToolLayout
-      description="Convert text into camelCase, snake_case, kebab-case, and Title Case."
-      onClear={() => setInput('')}
-      onCopy={() => copyText(JSON.stringify(output, null, 2))}
+    <ToolShell
       title="Case Converter"
+      description="Convert text into camelCase, snake_case, kebab-case, and Title Case."
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => copyText(JSON.stringify(output, null, 2))} type="button">Copy all</button>
+          <button className="btn btn-danger" onClick={() => setInput('')} type="button">Clear</button>
+        </>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Input text"><textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} /></Pane>
-        <Pane title="Converted cases">
-          <div className="space-y-3">
-            {Object.entries(output).map(([label, value]) => (
-              <div className="output-block" key={label}>
-                <strong>{label}</strong>
-                <div className="mt-2 break-all">{value}</div>
-              </div>
-            ))}
-          </div>
-        </Pane>
+      <div className="workspace workspace--C">
+        <Panel title="Input text" flush meta={`${byteCount(input)} B`}>
+          <CodeInput ariaLabel="Input text" onChange={setInput} value={input} />
+        </Panel>
+        <div className="output-stack">
+          {Object.entries(output).map(([label, value]) => (
+            <Panel key={label} title={label} meta={`${byteCount(value)} B`} onCopy={() => copyText(value)}>
+              <pre className="panel-output">{value}</pre>
+            </Panel>
+          ))}
+        </div>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }

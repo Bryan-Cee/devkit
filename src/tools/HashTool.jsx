@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import CryptoJS from 'crypto-js'
-import { Pane, ToolLayout } from '../components/ToolLayout'
+import { ToolShell, Panel, CodeInput } from '../components/Shell'
 import { useLocalStorage } from '../hooks/useLocalStorage'
-import { copyText } from '../utils/devkit'
+import { byteCount, copyText } from '../utils/devkit'
 
 export function HashTool() {
   const [input, setInput] = useLocalStorage('devkit-hash-input', 'Hash me!')
@@ -16,25 +16,28 @@ export function HashTool() {
   )
 
   return (
-    <ToolLayout
-      description="Generate MD5, SHA-1, and SHA-256 hashes for any text input."
-      onClear={() => setInput('')}
-      onCopy={() => copyText(JSON.stringify(hashes, null, 2))}
+    <ToolShell
       title="Hash Generator"
+      description="Generate MD5, SHA-1, and SHA-256 hashes for any text input."
+      actions={
+        <>
+          <button className="btn btn-secondary" onClick={() => copyText(JSON.stringify(hashes, null, 2))} type="button">Copy all</button>
+          <button className="btn btn-danger" onClick={() => setInput('')} type="button">Clear</button>
+        </>
+      }
     >
-      <div className="grid gap-4 xl:grid-cols-2">
-        <Pane title="Input text"><textarea className="textarea" onChange={(event) => setInput(event.target.value)} value={input} /></Pane>
-        <Pane title="Hashes">
-          <div className="space-y-3">
-            {Object.entries(hashes).map(([algorithm, value]) => (
-              <div className="output-block" key={algorithm}>
-                <strong>{algorithm}</strong>
-                <div className="mt-2 break-all">{value}</div>
-              </div>
-            ))}
-          </div>
-        </Pane>
+      <div className="workspace workspace--C">
+        <Panel title="Input text" flush meta={`${byteCount(input)} B`}>
+          <CodeInput ariaLabel="Input text" onChange={setInput} value={input} />
+        </Panel>
+        <div className="output-stack">
+          {Object.entries(hashes).map(([algorithm, value]) => (
+            <Panel key={algorithm} title={algorithm} validity="valid" meta={`${value.length} chars`} onCopy={() => copyText(value)}>
+              <pre className="panel-output">{value}</pre>
+            </Panel>
+          ))}
+        </div>
       </div>
-    </ToolLayout>
+    </ToolShell>
   )
 }
