@@ -3,25 +3,29 @@
 
 /* ─── Design tokens ──────────────────────────────────────────────────────────── */
 :root {
-  --bg: #0D1117;
-  --surface: #151B23;
-  --surface-hover: #1B2330;
-  --line: #2A313C;
-  --text: #E6E8EB;
-  --muted: #8B95A1;
-  --dim: #5A6472;
-  --accent: #5FD4A0;
-  --accent-dim: rgba(95, 212, 160, 0.22);
+  /* Dark theme — Catppuccin Mocha (https://github.com/catppuccin/catppuccin) */
+  --bg: #1e1e2e;            /* Base */
+  --surface: #181825;       /* Mantle */
+  --surface-hover: #313244; /* Surface0 */
+  --line: #313244;          /* Surface0 */
+  --text: #cdd6f4;          /* Text */
+  --muted: #a6adc8;         /* Subtext0 */
+  --dim: #6c7086;           /* Overlay0 */
+  --accent: #94e2d5;        /* Teal */
+  --accent-rgb: 148, 226, 213;
+  --accent-dim: rgba(var(--accent-rgb), 0.22);
   /* Syntax tokens — shared by every panel that renders formatted code */
-  --key: #7FB3FF;
-  --string: #E3B341;
-  --number: #F0883E;
-  --bool: #D2A8FF;
+  --key: #89b4fa;           /* Blue */
+  --string: #a6e3a1;        /* Green */
+  --number: #fab387;        /* Peach */
+  --bool: #cba6f7;          /* Mauve */
   /* Diff tokens (diff output only) */
-  --add: #5FD4A0;
-  --rem: #E05252;
-  --add-bg: rgba(95, 212, 160, 0.12);
-  --rem-bg: rgba(224, 82, 82, 0.12);
+  --add: #a6e3a1;           /* Green */
+  --rem: #f38ba8;           /* Red */
+  --rem-rgb: 243, 139, 168;
+  --add-bg: rgba(166, 227, 161, 0.14);
+  --rem-bg: rgba(var(--rem-rgb), 0.14);
+  --mark-rgb: 249, 226, 175; /* Yellow */
   --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Code', 'Fira Mono', monospace;
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
   color-scheme: dark;
@@ -36,15 +40,18 @@
   --muted: #5A6472;
   --dim: #8B95A1;
   --accent: #5FD4A0;
-  --accent-dim: rgba(95, 212, 160, 0.28);
+  --accent-rgb: 95, 212, 160;
+  --accent-dim: rgba(var(--accent-rgb), 0.28);
   --key: #1F6FEB;
   --string: #B7791F;
   --number: #C05621;
   --bool: #8250DF;
   --add: #1A7F5A;
   --rem: #C23A3A;
+  --rem-rgb: 224, 82, 82;
   --add-bg: rgba(95, 212, 160, 0.18);
   --rem-bg: rgba(224, 82, 82, 0.16);
+  --mark-rgb: 245, 158, 11;
   color-scheme: light;
 }
 
@@ -195,7 +202,7 @@ textarea {
 
 .tool-row:hover {
   border-left-color: var(--accent);
-  background-color: rgba(95, 212, 160, 0.06);
+  background-color: rgb(var(--accent-rgb) / 0.06);
 }
 
 .tool-row-name {
@@ -224,7 +231,7 @@ textarea {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   color: var(--accent);
-  background: rgba(95, 212, 160, 0.12);
+  background: rgb(var(--accent-rgb) / 0.12);
   padding: 0.1875rem 0.5rem;
   flex-shrink: 0;
   line-height: 1.4;
@@ -360,13 +367,13 @@ textarea {
 .nav-item--active {
   color: var(--accent);
   border-left-color: var(--accent);
-  background: rgba(95, 212, 160, 0.08);
+  background: rgb(var(--accent-rgb) / 0.08);
 }
 
 .nav-item--active:hover {
   color: var(--accent);
   border-left-color: var(--accent);
-  background: rgba(95, 212, 160, 0.12);
+  background: rgb(var(--accent-rgb) / 0.12);
 }
 
 /* ─── Mobile sidebar / top bar ───────────────────────────────────────────────── */
@@ -456,7 +463,7 @@ textarea {
 .select:focus {
   border-color: var(--accent);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(95, 212, 160, 0.2);
+  box-shadow: 0 0 0 2px rgb(var(--accent-rgb) / 0.2);
 }
 
 .textarea {
@@ -489,11 +496,11 @@ textarea {
 .btn-primary {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(95, 212, 160, 0.1);
+  background: rgb(var(--accent-rgb) / 0.1);
 }
 
 .btn-primary:hover {
-  background: rgba(95, 212, 160, 0.2);
+  background: rgb(var(--accent-rgb) / 0.2);
 }
 
 .btn-secondary {
@@ -512,8 +519,8 @@ textarea {
 }
 
 .btn-danger:hover {
-  border-color: #e05252;
-  color: #e05252;
+  border-color: var(--rem);
+  color: var(--rem);
 }
 
 /* ─── Badge ──────────────────────────────────────────────────────────────────── */
@@ -549,7 +556,7 @@ textarea {
 }
 
 .mark-highlight {
-  background: rgba(245, 158, 11, 0.3);
+  background: rgb(var(--mark-rgb) / 0.3);
   padding: 0 2px;
 }
 
@@ -644,11 +651,11 @@ textarea {
 
 .tool-shell__error {
   flex-shrink: 0;
-  border: 1px solid rgba(224, 82, 82, 0.4);
-  background: rgba(224, 82, 82, 0.08);
+  border: 1px solid rgb(var(--rem-rgb) / 0.4);
+  background: rgb(var(--rem-rgb) / 0.08);
   padding: 0.5rem 0.75rem;
   font-size: 0.8125rem;
-  color: #e05252;
+  color: var(--rem);
   font-family: var(--font-mono);
 }
 
@@ -737,7 +744,7 @@ textarea {
 }
 
 .panel__dot--valid { background: var(--accent); }
-.panel__dot--error { background: #e05252; }
+.panel__dot--error { background: var(--rem); }
 
 .panel__body {
   flex: 1;
@@ -927,8 +934,8 @@ textarea {
 }
 
 .kv-remove:hover {
-  border-color: #e05252;
-  color: #e05252;
+  border-color: var(--rem);
+  color: var(--rem);
 }
 
 .kv-section {
@@ -1010,7 +1017,7 @@ textarea {
 .chip--active {
   border-color: var(--accent);
   color: var(--accent);
-  background: rgba(95, 212, 160, 0.1);
+  background: rgb(var(--accent-rgb) / 0.1);
 }
 
 .chip-number {
