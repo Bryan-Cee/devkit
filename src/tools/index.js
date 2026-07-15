@@ -56,6 +56,14 @@ export const tools = [
     component: lazyTool(() => import('./MarkdownTool'), 'MarkdownTool'),
   },
   {
+    slug: 'mermaid-viewer',
+    name: 'Mermaid Diagram Viewer',
+    description: 'Write Mermaid syntax and preview flowcharts, sequence diagrams, and more.',
+    keywords: ['mermaid', 'diagram', 'flowchart', 'sequence', 'preview'],
+    category: 'Text / Data format',
+    component: lazyTool(() => import('./MermaidTool'), 'MermaidTool'),
+  },
+  {
     slug: 'url-parser',
     name: 'URL Parser',
     description: 'Inspect URL pieces and rebuild query strings.',
